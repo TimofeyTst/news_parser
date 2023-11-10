@@ -21,13 +21,7 @@ class Worker:
                 await self.client.que.put(None)
                 break
 
-            # src, cat, supcat, url = data
-            # response = await self.fetch_url(url)
             await self.parser.fetch_and_parse(*data)
-            # Обработка и сохранение ответа
-            # Здесь будет key switch в зависимости от source
-            # text = self.parse_html(response)
-            # self.save(src, cat, supcat, text)
 
         for thread in threads:
             thread.join()

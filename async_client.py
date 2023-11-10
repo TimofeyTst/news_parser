@@ -3,6 +3,8 @@ import asyncio
 import aiohttp
 
 from process import Worker
+from abstract_parser import TICKERS
+import yfinance as yf
 
 
 class Client:
@@ -57,9 +59,16 @@ class Client:
             await asyncio.gather(*workers)
 
     def get_data(self):
-        with open(self.urls_file, "r") as file:
-            for data in file:
-                yield data.split()
+        source = "Yahoo"
+        category = "Investments"
+        for ticker in TICKERS.split():
+            api = yf.Ticker(ticker)
+            newses = api.news
+            for news in newses:
+                yield [source, category, ticker, news['link']]
+        # with open(self.urls_file, "r") as file:
+        #     for data in file:
+        #         yield data.split()
 
     def get_metadata(self):
         sources = [{"id": idx, "name": name} for idx, name in enumerate(self.sources)]

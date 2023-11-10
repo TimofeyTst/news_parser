@@ -1,7 +1,7 @@
 import aiohttp
 from bs4 import BeautifulSoup
 
-from abstract_parser import Parser
+from abstract_parser import Parser, TICKERS
 
 
 # Занимается парсингом всех новостей источника Yahoo
@@ -13,18 +13,20 @@ class YahooParser(Parser):
         self.root = "https://finance.yahoo.com"
 
     async def fetch_and_parse(self, src, cat, supcat, url):
-        news_list = await self.fetch_url(url)
-        if news_list is None:
-            return
-        # Далее нужно из response достать все url из li
-        # и пройтись по каждому
-        links = self.parse_news_links(news_list)
-        for news_link in links:
-            news = await self.fetch_url(news_link)
-            if news is None:
-                continue
-            news_text = self.parse_news_text(news)
-            self.callback(src, cat, supcat, news_text)
+        # news_list = await self.fetch_url(url)
+        # if news_list is None:
+        #     return
+        # # Далее нужно из response достать все url из li
+        # links = self.parse_news_links(news_list)
+        # for news_link in links:
+        #     news = await self.fetch_url(news_link)
+        #     if news is None:
+        #         continue
+        #     news_text = self.parse_news_text(news)
+        #     self.callback(src, cat, supcat, news_text)
+        news = await self.fetch_url(url)
+        news_text = self.parse_news_text(news)
+        self.callback(src, cat, supcat, news_text)
 
     async def fetch_url(self, url):
         try:
@@ -80,7 +82,7 @@ class YahooParser(Parser):
         source = "Yahoo"
         category = "Investments"
         with open(file_path, "w", encoding="utf-8") as file:
-            for ticker in self.TICKERS.split():
+            for ticker in TICKERS.split():
                 url = f"{self.root}/quote/{ticker}/news?p={ticker}"
                 line = f"{source} {category} {ticker} {url}\n"
                 file.write(line)
